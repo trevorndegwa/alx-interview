@@ -1,21 +1,31 @@
 #!/usr/bin/python3
 """
-function calculates the no. of coins
-needed from a list of variable amounts of coins
-to reach a total figure
+function calculates the fewest number
+of coins needed for a given total
 """
 
 
 def makeChange(coins, total):
     """
-    when given a pile of cons of different values,
-    the function determines the fewest number of coins
-    needed to meet a given amount total
+    Determines the fewest no. of coins
+    for a given total
+
+    Parameters:
+        coins (list): list of coins values available
+        total (int): total amount to achieve
+    Returns:
+        int: fewest coins needed
     """
     if total <= 0:
         return 0
+
+    # Initialise the DP table
     dp = [0] + [float("inf")] * total
+
+    # Fill the DP table
     for coin in coins:
         for i in range(coin, total + 1):
             dp[i] = min(dp[i], dp[i - coin] + 1)
-    return dp[-1] if dp[-1] != float("inf") else -1
+
+    # Return the result
+    return dp[total] if dp[total] != float("inf") else -1
