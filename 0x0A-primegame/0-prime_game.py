@@ -3,46 +3,76 @@
 Prime Game
 """
 
-def sieve_of_eratosthenes(max_n):
+
+def findMultiples(num, targets):
     """
-    Computes a list of prime numbers up to max_n using the Sieve of Eratosthenes.
+    Finds multiples of a given number within a list
     """
-    is_prime = [True] * (max_n + 1)
-    is_prime[0] = is_prime[1] = False  # 0 and 1 are not primes
-    for i in range(2, int(max_n**0.5) + 1):
-        if is_prime[i]:
-            for multiple in range(i * i, max_n + 1, i):
-                is_prime[multiple] = False
-    return is_prime
+    for i in targets:
+        if i % num == 0:
+            targets.remove(i)
+    return targets
+
+
+def isPrime(i):
+    """
+    Check if a number is prime.
+    """
+    if i == 1:
+        return False
+    for j in range(2, i):
+        if i % j == 0:
+            return False
+    return True
+
+
+def findPrimes(n):
+    """
+    Dispatch a given set into prime numbers and non-prime numbers.
+    """
+    counter = 0
+    target = list(n)
+    for i in range(1, len(target) + 1):
+        if isPrime(i):
+            counter += 1
+            target.remove(i)
+            target = findMultiples(i, target)
+        else:
+            pass
+    return counter
+
 
 def isWinner(x, nums):
     """
-    Determines the winner of the prime game after x rounds.
+    Maria and Ben are playing a game.Given a set of consecutive integers
+    starting from 1 up to and including n, they take turns choosing a
+    prime number from the set and removing that number and its
+    multiples from the set.
+    The player that cannot make a move loses the game.
+
+    They play x rounds of the game, where n may be different for each round.
+    Assuming Maria always goes first and both players play optimally,
+    determine who the winner of each game is.
     """
-    if not nums or x < 1:
-        return None
+    players = {'Maria': 0, 'Ben': 0}
+    cluster = set()
+    for elem in range(x):
+        nums.sort()
+        num = nums[elem]
+        for i in range(1, num + 1):
+            cluster.add(i)
+            if i == num + 1:
+                break
+        temp = findPrimes(cluster)
 
-    max_n = max(nums)
-    is_prime = sieve_of_eratosthenes(max_n)
-    
-    # Precompute the cumulative number of primes up to each number
-    primes_count = [0] * (max_n + 1)
-    for i in range(1, max_n + 1):
-        primes_count[i] = primes_count[i - 1] + (1 if is_prime[i] else 0)
+        if temp % 2 == 0:
+            players['Ben'] += 1
+        elif temp % 2 != 0:
+            players['Maria'] += 1
 
-    # Determine the winner for each round
-    maria_wins = 0
-    ben_wins = 0
-    for n in nums:
-        if primes_count[n] % 2 == 1:  # Odd number of primes -> Maria wins
-            maria_wins += 1
-        else:  # Even number of primes -> Ben wins
-            ben_wins += 1
-
-    if maria_wins > ben_wins:
-        return "Maria"
-    elif ben_wins > maria_wins:
-        return "Ben"
+    if players['Maria'] > players['Ben']:
+        return 'Maria'
+    elif players['Maria'] < players['Ben']:
+        return 'Ben'
     else:
         return None
-
